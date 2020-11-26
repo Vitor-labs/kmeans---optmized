@@ -8,13 +8,13 @@ K-Means-- is an extesion of k-means that performs simultaneously both clustering
 
 ```python
 from kmeansmm import KMeansMM
-import torch
 ```
 
 
 ```python
 from sklearn.datasets import make_blobs
 import matplotlib.pyplot as plt
+import torch
 
 n_samples = 1000
 X, y = make_blobs(n_samples=n_samples, random_state=1232)
