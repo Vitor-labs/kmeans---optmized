@@ -1,10 +1,13 @@
 # kmeans--
 ## KMeans-- (K-Means minus minus) Pytorch implementation with GPU/CPU support
 
-PyTorch implementation of the paper "k-means--: A unified approach to clustering and outlier detection" by Sanjay Chawla and Aristides Gionis.
-If CUDA is enabled, the model can run on GPU.
+PyTorch implementation of the paper ["k-means--: A unified approach to clustering and outlier detection"](http://users.ics.aalto.fi/gionis/kmmm.pdf) by Sanjay Chawla and Aristides Gionis.
+
 
 K-Means-- is an extesion of k-means that performs simultaneously both clustering and outliers detection. It takes as input the number of clusters (k) and the number of outliers (l).
+
+If CUDA is enabled, the model can run on GPU.
+
 
 ```python
 from kmeansmm import KMeansMM
