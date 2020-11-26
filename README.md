@@ -27,19 +27,7 @@ plt.scatter(X[:, 0], X[:, 1], c=y_pred.cpu())
 
 
 
-    <matplotlib.collections.PathCollection at 0x7f442ca6ab38>
-
-
-
-
     
 ![png](output_1_1.png)
     
-
-
-
-```python
-
-```
-
 
