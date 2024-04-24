@@ -7,6 +7,7 @@ name = "pypi"
 torch = "*"
 scikit-learn = "*"
 matplotlib = "*"
+scikit-optimize = "*"
 
 [dev-packages]
 ipykernel = "*"
