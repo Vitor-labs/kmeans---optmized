@@ -8,6 +8,8 @@ and outliers detection. It takes as input the number of clusters (k) and the
 number of outliers (l).
 """
 
+from typing_extensions import Self
+
 import torch
 
 
@@ -44,10 +46,31 @@ class KMeansMM:
         self.max_iter = max_iter
         self.tol = tol
 
-    def euclidean(self, X, centroids):
+    def euclidean(self, X: torch.Tensor, centroids: torch.Tensor) -> torch.Tensor:
+        """
+        Calculate the Euclidean distance between each point in X and each centroid
+        in centroids.
+
+        Parameters:
+            X (torch.Tensor): Input tensor of shape (n_samples, n_features).
+            centroids (torch.Tensor): Tensor of centroids of shape (n_centroids, n_features).
+
+        Returns:
+            torch.Tensor: The tensor of shape (n_samples, n_centroids) containing
+            the Euclidean distances.
+        """
         return ((X[:, None, :] - centroids[None, :, :]) ** 2).sum(dim=-1)
 
-    def fit(self, X):
+    def fit(self, X: torch.Tensor) -> Self:
+        """
+        Fits the model to the input data.
+
+        Parameters:
+            X (torch.Tensor): The input data of shape (n_samples, n_features).
+
+        Returns:
+            Self: The fitted model.
+        """
         X = X.to(self.device)
         # initialize centroids as random points from X
         perm = torch.randperm(X.shape[0])
@@ -81,8 +104,19 @@ class KMeansMM:
 
         return self
 
-    def predict(self, X):
+    def predict(self, X: torch.Tensor) -> torch.Tensor:
+        """
+        Predicts the labels for the input data based on the fitted model.
+
+        Parameters:
+            X (torch.Tensor): The input data of shape (n_samples, n_features).
+
+        Returns:
+            torch.Tensor: The predicted labels for the input data.
+        """
         X = X.to(self.device)
+        assert self.centroids is not None, "Model must be fitted before predicting"
+
         distances = self.euclidean(X, self.centroids)
         mins = distances.min(dim=1)
         labels = mins[1]  # argmin
@@ -94,7 +128,16 @@ class KMeansMM:
         labels[L] = -1  # remove outliers from the assigned cluster
         return labels
 
-    def fit_predict(self, X):
+    def fit_predict(self, X: torch.Tensor) -> torch.Tensor:
+        """
+        Fits the model to the input data and then predicts the labels for the input data.
+
+        Parameters:
+            X (torch.Tensor): The input data of shape (n_samples, n_features).
+
+        Returns:
+            torch.Tensor: The predicted labels for the input data.
+        """
         X = X.to(self.device)
         self.fit(X)
         return self.predict(X)
