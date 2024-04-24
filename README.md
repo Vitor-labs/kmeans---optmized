@@ -13,7 +13,6 @@ If CUDA is enabled, the model can run on GPU.
 from kmeansmm import KMeansMM
 ```
 
-
 ```python
 from sklearn.datasets import make_blobs
 import matplotlib.pyplot as plt
@@ -25,12 +24,5 @@ X, y = make_blobs(n_samples=n_samples, random_state=1232)
 y_pred = KMeansMM(n_clusters=3, l=2, max_iter=1000, device = 'cuda').fit_predict(torch.FloatTensor(X))
 
 plt.scatter(X[:, 0], X[:, 1], c=y_pred.cpu())
-```
-
-
-
-
-    
-![png](output_1_1.png)
-    
+```   
 
