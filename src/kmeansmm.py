@@ -11,6 +11,7 @@ number of outliers (l).
 from typing_extensions import Self
 
 import torch
+import numpy as np
 
 
 class KMeansMM:
@@ -39,14 +40,16 @@ class KMeansMM:
         tol: float = 0.0001,
         device: str = "cuda" if torch.cuda.is_available() else "cpu",
     ) -> None:
-        self.k = n_clusters
-        self.l = l
+        self.n_clusters = n_clusters if n_clusters > 1 else 2
+        self.l = l if l > 1 else 2
         self.device = torch.device(device)
         self.centroids = None
         self.max_iter = max_iter
         self.tol = tol
 
-    def euclidean(self, X: torch.Tensor, centroids: torch.Tensor) -> torch.Tensor:
+    def __euclidean(
+        self, X: torch.Tensor, centroids: torch.Tensor  # pylint:disable=C0103
+    ) -> torch.Tensor:
         """
         Calculate the Euclidean distance between each point in X and each centroid
         in centroids.
@@ -61,7 +64,7 @@ class KMeansMM:
         """
         return ((X[:, None, :] - centroids[None, :, :]) ** 2).sum(dim=-1)
 
-    def fit(self, X: torch.Tensor) -> Self:
+    def fit(self, X: torch.Tensor) -> Self:  # pylint:disable=C0103
         """
         Fits the model to the input data.
 
@@ -71,27 +74,31 @@ class KMeansMM:
         Returns:
             Self: The fitted model.
         """
+        assert X.ndim == 2, "X must be a 2D tensor"
         X = X.to(self.device)
+
+        with open("kmeansmm.log", "a", encoding="utf-8") as log:
+            log.write(f"X shape: {X.shape}\nClusters: {self.n_clusters}\nL: {self.l}\n")
+
         # initialize centroids as random points from X
-        perm = torch.randperm(X.shape[0])
-        idx = perm[: self.k]
+        idx = torch.randperm(X.shape[0])[: self.n_clusters]
         centroids = X[idx, :]
         previous_state = centroids.clone()
 
         for _ in range(self.max_iter):
             # Compute distances between points and centroids
-            distances = self.euclidean(X, centroids)
+            distances = self.__euclidean(X, centroids)
 
             # Select closest centroid for each point
             mins = distances.min(dim=1)
             labels = mins[1]  # argmin
             mindists = mins[0]  # min
             # take l points with largest distance from centroids
-            L = torch.topk(mindists, k=self.l)[1]
+            L = torch.topk(mindists, k=self.l)[1]  # pylint:disable=C0103
             # remove outliers from the assigned cluster (assign special cluster/label -1)
             labels[L] = -1
             # Compute new centroids
-            for cl in range(self.k):
+            for cl in range(self.n_clusters):
                 centroids[cl] = X[labels == cl, :].mean(dim=0)
             # Check for convergence
             centroids_shift = (
@@ -104,7 +111,9 @@ class KMeansMM:
 
         return self
 
-    def predict(self, X: torch.Tensor) -> torch.Tensor:
+    def predict(
+        self, X: torch.Tensor | np.ndarray  # pylint:disable=C0103
+    ) -> torch.Tensor:
         """
         Predicts the labels for the input data based on the fitted model.
 
@@ -114,21 +123,27 @@ class KMeansMM:
         Returns:
             torch.Tensor: The predicted labels for the input data.
         """
-        X = X.to(self.device)
         assert self.centroids is not None, "Model must be fitted before predicting"
 
-        distances = self.euclidean(X, self.centroids)
+        if isinstance(X, torch.Tensor):
+            X = X.to(self.device)
+        if isinstance(X, np.ndarray):
+            X = torch.from_numpy(X)
+
+        distances = self.__euclidean(X, self.centroids)
         mins = distances.min(dim=1)
         labels = mins[1]  # argmin
         mindists = mins[0]  # min
 
-        L = torch.topk(mindists, k=self.l)[
+        L = torch.topk(mindists, k=self.l)[  # pylint:disable=C0103
             1
         ]  # take l points with largest distance from centroids
         labels[L] = -1  # remove outliers from the assigned cluster
         return labels
 
-    def fit_predict(self, X: torch.Tensor) -> torch.Tensor:
+    def fit_predict(
+        self, X: torch.Tensor | np.ndarray  # pylint:disable=C0103
+    ) -> torch.Tensor:
         """
         Fits the model to the input data and then predicts the labels for the input data.
 
@@ -138,6 +153,9 @@ class KMeansMM:
         Returns:
             torch.Tensor: The predicted labels for the input data.
         """
-        X = X.to(self.device)
+        if isinstance(X, torch.Tensor):
+            X = X.to(self.device)
+        if isinstance(X, np.ndarray):
+            X = torch.from_numpy(X)
         self.fit(X)
         return self.predict(X)
