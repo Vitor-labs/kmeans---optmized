@@ -8,6 +8,9 @@ torch = "*"
 scikit-learn = "*"
 matplotlib = "*"
 scikit-optimize = "*"
+bayesian-optimization = "*"
+requests = "*"
+pandas = "*"
 
 [dev-packages]
 ipykernel = "*"
