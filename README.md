@@ -4,7 +4,7 @@
 | Refs:                                                                                                            |
 | ---------------------------------------------------------------------------------------------------------------- |
 | ["k-means--: A unified approach to clustering and outlier detection"](http://users.ics.aalto.fi/gionis/kmmm.pdf) |
-| ["Bayesian Optimization"](https://github.com/bayesian-optimization/BayesianOptimization)                         |
+| ["Bayesian Optimization"](https://github.com/bayesian-optimization/BayesianOptimization) |
 
 
 K-Means-- is an extesion of k-means that performs simultaneously both clustering and outliers detection. It takes as input the number of clusters (k) and the number of outliers (l).
