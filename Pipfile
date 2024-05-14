@@ -5,12 +5,14 @@ name = "pypi"
 
 [packages]
 torch = "*"
+pytorch-mutex = "*"
 scikit-learn = "*"
+fastparquet = "*"
 matplotlib = "*"
-scikit-optimize = "*"
-bayesian-optimization = "*"
 requests = "*"
+pyarrow = "*"
 pandas = "*"
+numpy = "*"
 
 [dev-packages]
 ipykernel = "*"
